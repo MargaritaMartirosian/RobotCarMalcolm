@@ -1,0 +1,98 @@
+/*This code is used for line traking mode . 
+The robot uses a sensors that uses reflection.
+If the middle does not reflect, the robot has to go forward.
+If the left does not reflect, the robot has to turn left.
+If the right does not reflect , the robot has the turn right. 
+Line tracking is made with the "if" function.
+To know the values , connect Analog pins used in sensor to Serial monitor.
+ */
+//------------VARIABLES AND VALUES -------------
+int L= A2; //variable left connected to pin A2 of arduino UNO
+int M= A1; //variable middle connected to pin A1 of Arduino UNO
+int R= A0;// varible right connected yo pin A0 of Arduino UNO
+int const  AIN1 = 8;// Motor 1 connected to pin 8 of arduino UNO
+int const PWMA = 5;// Motor 1 connected to pin 5 of arduino UNO
+int const BIN1 = 7;// Motor 2 connected to pin 7 of arduino UNO
+int const PWMB = 6;// Motor 2 connected to pin 6 of arduino UNO
+int i ; // variable i used in for loop
+int STBY = 3; //pin 3 of arduino UNO used for direction
+
+//-----------------SETUP--------------------
+void setup(){ // put your code here to run once
+  Serial.begin(9600); // initialize serial communication at 9600 bits per second
+  pinMode( L,INPUT);  // pin A2 defined as an Input 
+  pinMode( M,INPUT);  // pin A1 defined as an Input 
+  pinMode( R,INPUT);  //pin A0 defined as an Input 
+  pinMode( i, OUTPUT);// define variable i as an Output
+  pinMode(STBY,OUTPUT);//pin 3 defined as an Output
+  for (int i; i = 0; i <= 255) {
+ }
+}
+//----------------FUNCTIONS----------------
+void forward () {         // details for forward function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 1);  // Motor 1 clockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 1);  // Motor 2 clockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  delay(100);
+}
+void left () {            // details for left function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 1);  // Motor 1 clockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 0);  // Motor 2 counterclockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  delay(100);
+}
+void right () {           // details for right function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 0);  // Motor 1 counterclockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 1);  // Motor 2 clockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  delay(100);
+}
+void Stop () {            // datails for stop function
+  digitalWrite(STBY,LOW); // STBY pin 3 is OFF
+  digitalWrite(AIN1, 1);  // Motor 1 clockwise direction 
+  analogWrite(PWMA, 0);   // Speed is 0 
+  digitalWrite(BIN1, 1);  // Motor 2 clockwise direction 
+  analogWrite(PWMB, 0);   // Speed is 0
+  delay(100);
+}
+//---------------- LINE TRACKING ROBOT ----------------
+void loop() { // put your main code here, to run repeatedly
+int leftV =analogRead(A2);// read bit value of analog pin A2
+int centerV =analogRead(A1);// read bit value of analog pin A1
+int rightV =analogRead(A0);// read bit value of analog pin A0
+
+  Serial.print("Left = ");// prints data to the serial port as human-readable ASCII text.
+  Serial.println(leftV);  // prints out the value of bits
+  Serial.println("\t"   );// escape sequence for a tab  
+  
+  Serial.print("Center = ");// prints data to the serial port as human-readable ASCII text.
+  Serial.print(centerV);    // prints out the value of bits
+  Serial.println("\t"   );  // escape sequence for a tab  
+  
+  Serial.print(" Right = ");// prints data to the serial port as human-readable ASCII text.
+  Serial.print(rightV);     // prints out the value of bits
+  Serial.print("\t"   );    // escape sequence for a tab
+  
+    
+ if ((centerV>450)&&(centerV<550)){ // if bit value is more than 450 in the middle go forward
+ forward();       // using forward function
+}
+ if ((rightV>450)&&(rightV<550)){// if bit value is more than 450 and less than 550  in the right, go forward
+ right();        // using right function 
+}
+ if ((leftV>450)&&(leftV<550)){// if bit value is more than 450 and less than 550 in the left, go forward
+ left();        // using left function
+}
+ if((centerV> 950) && (rightV >950) &&( leftV >950)){// if middle, left and right are more than 950, stop the car
+ Stop();        // using stop function
+ }
+  if((centerV< 40) && (rightV <40) &&( leftV <40)){// if middle, left and right are less than 40, stop the car
+ Stop();        // using stop function
+ }
+}
