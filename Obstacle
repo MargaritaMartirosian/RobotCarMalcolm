@@ -1,0 +1,150 @@
+/* This code is used to make a robot car automatic.
+By using an Ultrasonic sensor , the car can avoid obstacles.
+The use of a servo make the sensor move left and right.
+The minimum distance is 20 cm. By using functions for each direction
+it is easier to control the robot. 
+ */
+#include <Servo.h> // include servo library 
+Servo servo1;  // servo variable 
+const int echoPin = 12; // attach pin 6 Arduino to pin Echo of HC-SR04
+const int trigPin = 13; // attach pin 11 Arduino to pin Trig of HC-SR04
+long duration;          // variable for the duration of sound wave travel
+int distance;       // variable for the distance measurement
+int const  AIN1 = 8;// Motor 1 connected to pin 8 of arduino UNO
+int const PWMA = 5; // Motor 1 connected to pin 5 of arduino UNO
+int const BIN1 = 7; // Motor 2 connected to pin 7 of arduino UNO
+int const PWMB = 6; // Motor 2 connected to pin 6 of arduino UNO
+int i ;             // variable i used in for loop
+int STBY = 3;       // pin 3 of arduino UNO used for direction
+int rightDistance = 0, leftDistance = 0, middleDistance = 0;
+// these variables are used for direction
+
+//----------------FUNCTIONS----------------
+void forward () {         // details for forward function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 1);  // Motor 1 clockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 1);  // Motor 2 clockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  Serial.println("Forward");// prints data to the serial port as human-readable ASCII text.
+}
+  
+  void backward () {      // details for backward function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 0);  // Motor 1 counterclockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 0);  // Motor 2 counterclockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  Serial.println("Backward");// prints data to the serial port as human-readable ASCII text.
+}
+
+void left () {            // details for left function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 1);  // Motor 1 clockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 0);  // Motor 2 counterclockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  Serial.println("Left");// prints data to the serial port as human-readable ASCII text.
+
+}
+void right () {           // details for right function
+  digitalWrite(STBY,HIGH);// STBY pin 3 is ON
+  digitalWrite(AIN1, 0);  // Motor 1 counterclockwise direction 
+  analogWrite(PWMA, 100); // Speed is 100
+  digitalWrite(BIN1, 1);  // Motor 2 clockwise direction 
+  analogWrite(PWMB, 100); // Speed is 100
+  Serial.println("Right");// prints data to the serial port as human-readable ASCII text.
+
+}
+void Stop () {            // datails for stop function
+  digitalWrite(STBY,LOW); // STBY pin 3 is OFF
+  digitalWrite(AIN1, 1);  // Motor 1 clockwise direction 
+  analogWrite(PWMA, 0);   // Speed is 0 
+  digitalWrite(BIN1, 1);  // Motor 2 clockwise direction 
+  analogWrite(PWMB, 0);   // Speed is 0
+  Serial.println("STOP"); // prints data to the serial port as human-readable ASCII text.
+
+}
+//----------------ULTRASONIC SETUP ----------------
+
+int Calculation() { // function used for an ultrasonic setup/information
+digitalWrite(trigPin, LOW); // Sets the trigPin LOW  (UNACTIVE) for 2 µs
+delayMicroseconds(2);
+digitalWrite(trigPin, HIGH);// Sets the trigPin HIGH (ACTIVE) for 10 µs                           
+delayMicroseconds(10);      // generating ultrasound wave 
+digitalWrite(trigPin, LOW);
+// Reads the echoPin, returns the sound wave travel time in microseconds
+float distance = pulseIn(echoPin, HIGH); 
+distance= distance / 58; // distance calculation 
+return (int)distance;            
+
+//----------------PINS INFORMATION----------------
+}
+  void setup()  {          // code used once 
+
+  servo1.attach (10);      //attaches our servo on pins 9 for data
+  servo1.write(90);        // move servo to center position (90 degrees)
+  Serial.begin(9600);      // Serial Communication is starting with 9600 of baudrate speed
+  pinMode(trigPin, OUTPUT);// Sets the trigPin as an OUTPUT
+  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+  Serial.begin(9600);      // Serial Communication is starting with 9600 of baudrate speed
+  pinMode( i, OUTPUT); // define variable i as an Output
+  pinMode(STBY,OUTPUT);//pin 3 defined as an Output
+  for (int i=3; i <9; i ++) {//(initialization; condition; increment)
+  }
+  Stop();// Stop function used , robot is initially without mouvement 
+}
+ 
+
+//----------------CONTROL FOR ROBOT ----------------
+void loop() {
+servo1.write(90); //setservo position according to scaled value
+delay(500);
+middleDistance = Calculation(); // variable is equal to the value of Calculation() function 
+
+if(middleDistance <= 20) { //if the distance measured in Calculation() is less than 20, stop
+Stop(); // use Stop function
+delay(300);
+servo1.write(10); // turn servo to 10 degrees 
+delay(1000);
+
+rightDistance = Calculation();
+// variable is equal to the value of  Calculation() function
+delay(300);
+servo1.write(90);// turn servo to 90 degrees 
+delay(1000);
+servo1.write(180);// turn servo to 180 degrees 
+delay(1000);
+
+leftDistance = Calculation();
+// variable is equal to the value of  Calculation() function
+delay(500);
+servo1.write(90);// turn servo to 90 degrees 
+delay(1000);
+delay(500);
+servo1.write(90);// turn servo to 90 degrees 
+delay(1000);
+
+if(rightDistance > leftDistance) {
+// right distance is bigger than the left 
+right(); // use Right function
+delay(360);
+}
+else if(rightDistance < leftDistance) {
+// right distance is less than the left 
+left(); // use left function
+delay(360);
+}
+else if((rightDistance <= 20) || (leftDistance <= 20)) {
+  // if it is less than 20 cm
+backward(); // use backward function
+delay(180);
+}
+else {
+forward(); //use forward function
+}
+}
+else {
+forward();  //use forward function
+}
+}
