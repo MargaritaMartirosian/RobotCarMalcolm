@@ -1,27 +1,37 @@
+#include <Obstacle.h>
 #include <Servo.h>
 #include <TFT.h>
 #include <Wire.h>
 #include <MOTOR.h>
+
 // added NOT ORIGINAL
 //#INCLUDE INFRARED FILE
 bool Left,Down,Right,Up,Square,Cross,Circle,Triangle,L1,R1,L2,R2;
 byte LStickY,LStickX;
 //byte R2;
 MOTOR motor(8, 7, 5, 6, 3); // NEW NOT ORIGINAL 
+
 Servo myservo;
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   myservo.attach(11);
+
+
   Wire.begin(14);
   Wire.onReceive(receiveEvent);
+
   Serial.begin(115200);
 
   motor.init(); // NEW NOT ORIGINAL 
+ 
 }
 
 void loop() {
-  Serial.print("LSX: ");
+
+ // obstacle.update();
+  /*Serial.print("LSX: ");
   Serial.print(LStickX);
   Serial.print("\t");
   Serial.print("LSY: ");
@@ -64,6 +74,7 @@ void loop() {
   Serial.print(R2);
   Serial.print("\t");
   Serial.println();
+  */
   // NOT ORIGINAL 
   
 }// added
@@ -77,17 +88,28 @@ void receiveEvent(int bytes) {
     Right = Wire.read(); 
     Up = Wire.read(); 
     Square = Wire.read(); 
+       if(Square==1){     
+      motor.right();
+    
+    }
     Cross = Wire.read(); 
+       if(Cross==1){     
+      motor.backward();
+    }
     Circle = Wire.read(); 
+       if(Circle==1){     
+      motor.left();
+    }
     Triangle = Wire.read();
-    L1 = Wire.read(); 
-   
-    R1 = Wire.read(); 
-    if(R1==1){
+       if(Triangle==1){     
       motor.forward();
-    }else{
+    }
+    L1 = Wire.read(); 
+      if(L1==1){     
       motor.Stop();
     }
+    R1 = Wire.read(); 
+  
     L2 = Wire.read(); 
     if(L2==1){
       myservo.write(20);
